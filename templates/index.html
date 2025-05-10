@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnonWipe - Remove Metadata from Files</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class'
+      }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 min-h-screen font-sans transition-colors duration-300" id="bodyRoot">
+    <div class="container mx-auto px-4 py-8 relative">
+        <header class="text-center mb-12 relative">
+            <h1 class="text-5xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-2 tracking-tight drop-shadow">AnonWipe</h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 font-medium">Remove metadata from your files while maintaining quality</p>
+            <button id="darkModeToggle" class="absolute top-0 right-0 p-2 rounded-full bg-indigo-100 dark:bg-gray-800 hover:bg-indigo-200 dark:hover:bg-gray-700 transition-colors shadow text-indigo-700 dark:text-yellow-300 text-2xl" title="Toggle dark mode">
+                <i id="darkModeIcon" class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="max-w-2xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl dark:shadow-gray-900 p-8 border border-indigo-100 dark:border-gray-800">
+            <div class="mb-8">
+                <div class="border-2 border-dashed border-indigo-200 dark:border-gray-700 rounded-xl p-8 text-center transition hover:border-indigo-400 dark:hover:border-gray-500 bg-white/60 dark:bg-gray-800/60">
+                    <input type="file" id="fileInput" class="hidden">
+                    <div class="space-y-4">
+                        <i class="fas fa-cloud-upload-alt text-5xl text-indigo-300 dark:text-indigo-400"></i>
+                        <p class="text-gray-600 dark:text-gray-300">Drag and drop your file here or</p>
+                        <button onclick="document.getElementById('fileInput').click()" class="bg-gradient-to-r from-indigo-500 to-blue-500 dark:from-indigo-700 dark:to-blue-900 text-white px-6 py-2 rounded-xl font-semibold shadow hover:from-indigo-600 hover:to-blue-600 dark:hover:from-indigo-800 dark:hover:to-blue-800 transition-colors">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fileInfo" class="hidden mb-8">
+                <div class="bg-indigo-50 dark:bg-gray-800 p-4 rounded-xl flex items-center gap-2">
+                    <i class="fas fa-file-alt text-indigo-400 dark:text-indigo-300"></i>
+                    <p class="text-gray-700 dark:text-gray-200"><span class="font-semibold">Selected file:</span> <span id="fileName"></span></p>
+                </div>
+            </div>
+
+            <button id="processButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-700 dark:to-emerald-900 text-white py-3 rounded-xl font-bold text-lg shadow hover:from-green-600 hover:to-emerald-600 dark:hover:from-green-800 dark:hover:to-emerald-800 transition-colors hidden">
+                Remove Metadata
+            </button>
+
+            <div id="loading" class="hidden text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 dark:border-indigo-300 border-t-transparent"></div>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">Processing your file...</p>
+            </div>
+
+            <div id="error" class="hidden bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-xl relative mt-4" role="alert">
+                <span class="block sm:inline"></span>
+            </div>
+        </div>
+
+        <!-- Our Stats Section -->
+        <div class="max-w-4xl mx-auto mt-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl p-10 flex flex-col md:flex-row justify-between items-center shadow-xl dark:shadow-gray-900 border border-indigo-100 dark:border-gray-800">
+            <div class="mb-8 md:mb-0 md:w-1/3">
+                <h2 class="text-2xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-4 flex items-center gap-2"><i class="fas fa-chart-bar text-indigo-400 dark:text-indigo-300"></i>Our Stats</h2>
+                <p class="text-gray-600 dark:text-gray-300">We have successfully processed the metadata files of thousands of people all over the world.</p>
+            </div>
+            <div class="flex-1 flex flex-col md:flex-row justify-around items-center w-full gap-8">
+                <div class="text-center md:mx-8 mb-8 md:mb-0">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fas fa-file-medical text-3xl text-indigo-400 dark:text-indigo-300"></i>
+                        <div id="filesProcessed" class="text-4xl font-extrabold text-indigo-600 dark:text-indigo-200">...</div>
+                    </div>
+                    <div class="text-lg text-gray-700 dark:text-gray-200 mt-2">Files Read &amp; Modified</div>
+                </div>
+                <div class="text-center md:mx-8">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fas fa-database text-3xl text-indigo-400 dark:text-indigo-300"></i>
+                        <div id="totalSize" class="text-4xl font-extrabold text-indigo-600 dark:text-indigo-200">...</div>
+                    </div>
+                    <div class="text-lg text-gray-700 dark:text-gray-200 mt-2">Files Processed In Size</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-lg dark:shadow-gray-900 p-6 border border-indigo-100 dark:border-gray-800">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center gap-2"><i class="fas fa-user-shield text-green-500"></i>Why Remove Metadata?</h2>
+                <ul class="space-y-3 text-gray-600 dark:text-gray-300">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-shield-alt text-green-400 mt-1"></i>
+                        <span>Protect your privacy by removing personal information</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-camera text-green-400 mt-1"></i>
+                        <span>Remove EXIF data from photos (location, camera info, etc.)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-music text-green-400 mt-1"></i>
+                        <span>Clean audio files of recording device information</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-file-pdf text-green-400 mt-1"></i>
+                        <span>Remove author and creation date from PDFs</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-lg dark:shadow-gray-900 p-6 border border-indigo-100 dark:border-gray-800">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center gap-2"><i class="fas fa-magic text-blue-500"></i>How It Works</h2>
+                <ol class="space-y-3 text-gray-600 dark:text-gray-300">
+                    <li class="flex items-start gap-2">
+                        <span class="bg-indigo-500 dark:bg-indigo-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">1</span>
+                        <span>Click "Remove Metadata" to process your file</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="bg-indigo-500 dark:bg-indigo-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2 flex-shrink-0">2</span>
+                        <span>Download your cleaned file</span>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <footer class="mt-16 py-8 bg-white/70 dark:bg-gray-900 border-t border-indigo-100 dark:border-gray-800 text-center rounded-t-2xl shadow-inner dark:shadow-gray-900 transition-colors duration-300">
+        <div class="container mx-auto flex flex-col md:flex-row justify-center items-center gap-4 text-gray-600 dark:text-gray-300 text-sm">
+            <span>&copy; 2024 AnonWipe</span>
+            <a href="/about" class="text-indigo-600 dark:text-indigo-300 hover:underline">About Us</a>
+            <a href="/privacy" class="text-indigo-600 dark:text-indigo-300 hover:underline">Privacy Policy</a>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // file upload logic
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const processButton = document.getElementById('processButton');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            fileName.textContent = file.name;
+            fileInfo.classList.remove('hidden');
+            processButton.classList.remove('hidden');
+            error.classList.add('hidden');
+        }
+
+        processButton.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            loading.classList.remove('hidden');
+            processButton.classList.add('hidden');
+            error.classList.add('hidden');
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'An error occurred');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'cleaned_' + file.name;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                fileInput.value = '';
+                fileInfo.classList.add('hidden');
+                processButton.classList.add('hidden');
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        function showError(message) {
+            let friendlyMsg = message;
+            if (message && message.startsWith('Unsupported file type:')) {
+                friendlyMsg = `Sorry, this file type is not supported yet.<br>Supported types: <span class='font-semibold'>Images (JPG, PNG, GIF, TIFF), Audio (MP3, WAV, OGG, AIFF, FLAC), PDF</span>.`;
+            }
+            error.classList.remove('hidden');
+            error.classList.remove('bg-red-100', 'border-red-400', 'text-red-700', 'dark:bg-red-900', 'dark:border-red-700', 'dark:text-red-200');
+            error.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-800', 'dark:bg-yellow-900', 'dark:border-yellow-700', 'dark:text-yellow-200');
+            error.querySelector('span').innerHTML = friendlyMsg;
+        }
+
+        function animateCountUp(element, target, suffix = '', duration = 1200) {
+            let start = 0;
+            const step = Math.ceil(target / (duration / 16));
+            function update() {
+                start += step;
+                if (start >= target) {
+                    element.textContent = target.toLocaleString() + suffix;
+                } else {
+                    element.textContent = start.toLocaleString() + suffix;
+                    requestAnimationFrame(update);
+                }
+            }
+            update();
+        }
+        
+        async function updateStats() {
+            try {
+                const res = await fetch('/stats');
+                const stats = await res.json();
+                animateCountUp(document.getElementById('filesProcessed'), stats.files_processed);
+                
+                const gb = stats.total_size_bytes / (1024 * 1024 * 1024);
+                animateCountUp(document.getElementById('totalSize'), Math.round(gb * 100) / 100, ' GB');
+            } catch (e) {
+                document.getElementById('filesProcessed').textContent = 'N/A';
+                document.getElementById('totalSize').textContent = 'N/A';
+            }
+        }
+        updateStats();
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+        function setDarkMode(on) {
+            if (on) {
+                document.documentElement.classList.add('dark');
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
+            }
+        }
+        const darkPref = localStorage.getItem('anonwipe-dark') === 'true';
+        setDarkMode(darkPref);
+        darkModeToggle.addEventListener('click', () => {
+            const isDark = !document.documentElement.classList.contains('dark');
+            setDarkMode(isDark);
+            localStorage.setItem('anonwipe-dark', isDark);
+        });
+    });
+    </script>
+</body>
+</html> 
