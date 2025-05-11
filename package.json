@@ -1,0 +1,17 @@
+{
+  "name": "anonwipe",
+  "version": "1.0.0",
+  "description": "Remove metadata from files while maintaining quality",
+  "main": "src/worker.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^3.12.0",
+    "pdfjs-dist": "^4.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+} 

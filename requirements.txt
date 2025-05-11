@@ -1,7 +1,8 @@
-Flask==3.0.2
+Flask==3.0.0
 Pillow==10.2.0
 python-magic==0.4.27
-mutagen==1.47.0
+hono==0.1.0
+wrangler==3.0.0
 PyPDF2==3.0.1
 Werkzeug==3.0.1
 python-dotenv==1.0.1 

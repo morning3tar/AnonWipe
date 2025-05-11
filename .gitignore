@@ -38,4 +38,7 @@ Thumbs.db
 # Project specific
 *.log
 temp/
-uploads/ 
+uploads/
+
+# New additions from the code block
+.env 

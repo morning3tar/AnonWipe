@@ -1,0 +1,10 @@
+name = "anonwipe"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[build]
+command = "npm install"
+upload.format = "service-worker"
+
+[site]
+bucket = "./static" 
